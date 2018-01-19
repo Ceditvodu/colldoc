@@ -1,0 +1,25 @@
+{
+  "name": "colldoc",
+  "version": "1.0.0",
+  "description": "document collector for simple html pages",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://ivan_kaduk@bitbucket.org/ivan_kaduk/colldoc.git"
+  },
+  "keywords": [
+    "documentation",
+    "docs",
+    "doc",
+    "html"
+  ],
+  "author": "Ivan Kaduk",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/ivan_kaduk/colldoc#readme",
+  "dependencies": {
+    "commander": "^2.13.0"
+  }
+}
