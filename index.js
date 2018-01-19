@@ -5,8 +5,17 @@ const program = require('commander');
 
 program
   .version('0.0.1')
-  .option('-o, --option','option description')
-  .option('-m, --more','we can have as many options as we want')
-  .option('-i, --input [optional]','optional user input')
-  .option('-I, --another-input <required>','required user input')
-  .parse(process.argv); // end with parse to parse through the input
+  .command('hellover <your name> [optional...]')
+  .description('hellover is program that can say hello!')
+  .option('-o, --option','we can still have add\'l options')
+  .action(function(req,optional){
+    console.log('\n!!!!!!!!!!!!!!!!!!!!');
+    console.log('well hello %s', req);
+    console.log('!!!!!!!!!!!!!!!!!!!!');
+    if (optional) {
+      optional.forEach(function(opt){
+        console.log("User passed optional arguments: %s!", opt);
+      });
+    }
+  });
+program.parse(process.argv); // notice that we have to parse in a new statement.
