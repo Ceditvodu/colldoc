@@ -21,5 +21,7 @@
   "homepage": "https://bitbucket.org/ivan_kaduk/colldoc#readme",
   "dependencies": {
     "commander": "^2.13.0"
-  }
+  },
+  "preferGlobal": true,
+  "bin": "index.js"
 }
