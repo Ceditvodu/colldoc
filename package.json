@@ -20,7 +20,8 @@
   "license": "MIT",
   "homepage": "https://bitbucket.org/ivan_kaduk/colldoc#readme",
   "dependencies": {
-    "commander": "^2.13.0"
+    "commander": "^2.13.0",
+    "fs-cheerio": "^2.0.1"
   },
   "preferGlobal": true,
   "bin": "index.js"
