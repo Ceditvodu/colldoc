@@ -23,9 +23,7 @@ const program = require('commander');
 
 
 const fs = require('fs');
-const fsc = require("fs-cheerio");
- 
-
+const cheerio = require('cheerio');
 
 if (process.argv.length <= 2) {
     console.log("Usage: " + __filename + " path/to/directory");
@@ -36,36 +34,60 @@ const path = process.argv[2];
  
 let menuItems = [];
 
-function getFileDom (filePath) {
+let menu;
+let $;
 
+function getFileDom (filePath) {
 	return new Promise( (resolve,reject) => {
-		fsc.readFile(filePath, 'utf8', (error, response) => {
+		fs.readFile(filePath, 'utf8', function(error, response) {
 			if(error){
 				reject('we have no files');
 			}else{
-				resolve(resolve);
+				resolve(response);
 			}
 		})
 	} );
 }
 
+function saveFile () {
+
+}
+
 fs.readdir(path, function(err, items) {
-  	// items.forEach( item => {
-  	// 	fs.readFile(path + item, 'utf8',(err, data) => {
-  	// 		console.log(path + item);
-  	// 		console.log(data);
-  	// 	});
-  	// } )
-  	items.forEach( item => {
-  		menuItems.push(item);
-  		getFileDom(path+item).then(response => {
-  			console.log(response);
-  			console.log('hi');
-  		}, error => {
-  			console.log('bad');
-  			console.log(error);
-  		})
-  	} )
-  	
-		console.log(menuItems);
+	// items.forEach( item => {
+	// 	fs.readFile(path + item, 'utf8',(err, data) => {
+	// 		console.log(path + item);
+	// 		console.log(data);
+	// 	});
+	// } )
+	items.forEach( item => {
+		menuItems.push(item);
+	} );
+
+	menu = items.reduce( ( a, b ) => {
+		return `${a}<li><a href="${b}">${b}</a></li>`;
+	}, '<ul>' ) + '</ul>';
+
+	console.log(menu);
+
+	items.forEach( item => {
+
+		getFileDom(path+item).then(response => {
+			$ = cheerio.load(response);
+			console.log($.html());
+			// console.log($('script'));
+			let body = $('body').html();
+			$('body').children().remove();
+			let columns = '<aside class="menu"></aside><srction class="content"></srction>'
+			$('body').append(columns);
+			$('.menu').append(menu);
+			$('.content').append(body);
+			console.log($.html());
+		}, error => {
+			console.log('bad');
+		})
+
+	} );
+	
+	console.log(menuItems);
 });
