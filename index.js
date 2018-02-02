@@ -24,18 +24,20 @@ const program = require('commander');
 
 const fs = require('fs');
 const cheerio = require('cheerio');
+const pathLib = require('path');
 
 if (process.argv.length <= 2) {
     console.log("Usage: " + __filename + " path/to/directory");
     process.exit(-1);
 }
  
-const path = process.argv[2];
+const path = process.argv[2] + '_docs';
  
 let menuItems = [];
 
 let menu;
 let $;
+
 
 function getFileDom (filePath) {
 	return new Promise( (resolve,reject) => {
@@ -53,41 +55,106 @@ function saveFile () {
 
 }
 
-fs.readdir(path, function(err, items) {
-	// items.forEach( item => {
-	// 	fs.readFile(path + item, 'utf8',(err, data) => {
-	// 		console.log(path + item);
-	// 		console.log(data);
-	// 	});
-	// } )
-	items.forEach( item => {
-		menuItems.push(item);
+function isFolderExist(folderPath){
+	return new Promise( (resolve, reject) => {
+		fs.access(path, (error) => {
+			if (error) {
+				console.log('there is no "_docs" folder, please add it to continue work');
+				reject();
+			}
+			resolve();
+		});
 	} );
+}
 
-	menu = items.reduce( ( a, b ) => {
-		return `${a}<li><a href="${b}">${b}</a></li>`;
+function getFilesNames(path){
+	return new Promise( (resolve, reject) => {
+		fs.readdir(path, function(error, items) {
+			if (error){
+				reject();
+			}
+			resolve(items);
+		});
+	} );
+} 
+
+async function generateFiles (filesNames) {
+
+	let htmlFilesNames = filesNames
+	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
+	
+	let menu = htmlFilesNames.reduce( ( a, b ) => {
+		return `${a}<li><a href="${b}">${pathLib.parse(b).name}</a></li>`;
 	}, '<ul>' ) + '</ul>';
 
-	console.log(menu);
+	for (let i=0; i<htmlFilesNames.length; i++) {
 
-	items.forEach( item => {
+		let filePath = `${path}/${htmlFilesNames[i]}`;
 
-		getFileDom(path+item).then(response => {
-			$ = cheerio.load(response);
-			console.log($.html());
-			// console.log($('script'));
-			let body = $('body').html();
-			$('body').children().remove();
-			let columns = '<aside class="menu"></aside><srction class="content"></srction>'
-			$('body').append(columns);
-			$('.menu').append(menu);
-			$('.content').append(body);
-			console.log($.html());
-		}, error => {
-			console.log('bad');
-		})
+		let fileContent = await getFileDom(filePath);
 
-	} );
-	
-	console.log(menuItems);
+		let $ = cheerio.load(fileContent);
+
+		let body = $('body').html();
+
+		$('body').children().remove();
+		let columns = '<aside class="menu"></aside><srction class="content"></srction>'
+		$('body').append(columns);
+		$('.menu').append(menu);
+		$('.content').append(body);
+		console.log($.html());
+
+	}
+
+	return 'cool'
+}
+
+isFolderExist(path).then(_=>{
+
+	getFilesNames(path).then( filesNames => {
+
+		generateFiles(filesNames).then( ()=>{
+			console.log('all is cool');
+		} );
+
+	})
+
 });
+
+
+
+// fs.readdir(path, function(err, items) {
+
+// 	items.forEach( item => {
+// 		menuItems.push(item);
+// 	} );
+
+// 	menu = items
+// 	.filter( fileName => pathLib.parse(fileName).ext === '.html' )
+// 	.reduce( ( a, b ) => {
+// 		return `${a}<li><a href="${b}">${pathLib.parse(b).name}</a></li>`;
+// 	}, '<ul>' ) + '</ul>';
+
+// 	console.log(menu);
+
+// 	items
+// 	.filter( fileName => fileName.substr(-5) === '.html' )
+// 	.forEach( item => {
+
+// 		getFileDom(path+item).then(response => {
+// 			$ = cheerio.load(response);
+// 			let body = $('body').html();
+// 			$('body').children().remove();
+// 			let columns = '<aside class="menu"></aside><srction class="content"></srction>'
+// 			$('body').append(columns);
+// 			$('.menu').append(menu);
+// 			$('.content').append(body);
+// 			console.log($.html());
+// 		}, error => {
+// 			console.log('bad');
+// 		})
+
+// 	} );
+	
+// 	console.log(menuItems);
+// });
