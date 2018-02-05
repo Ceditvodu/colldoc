@@ -1,27 +1,8 @@
 #!/usr/bin/env node
 'use strict!';
-
 /**
-	* @todo
-	* - take list of file names
-	* - generate menu from all this files with separete function that can take active item parameter
-	* - take DOM of every file
-	* - add generated menu in every file
+	* @author Ivan Kaduk
 	*/
-const program = require('commander');
-
-// program
-//   .version('0.0.1')
-//   .command('colldoc [optional...]')
-//   .description('hellover is program that can say hello!')
-//   .action(function(req,optional){
-//     console.log('works');
-//   });
-
-// console.log('hi');
-// program.parse(process.argv); // notice that we have to parse in a new statement.
-
-
 const fs = require('fs');
 const cheerio = require('cheerio');
 const pathLib = require('path');
@@ -31,33 +12,64 @@ if (process.argv.length <= 2) {
     process.exit(-1);
 }
  
-const path = process.argv[2] + '_docs';
+const path = process.argv[2];
+const resPath = path + '_docs';
+const	finalPath = path + 'docs';
  
-let menuItems = [];
+/**
+	* @name getFileContent
+	* @desc read files content
+	* @param {string} filePath - adress of file thet need to read
+	* @return {string} - file content in string 
+	*/
+function getFileContent (filePath) {
 
-let menu;
-let $;
-
-
-function getFileDom (filePath) {
 	return new Promise( (resolve,reject) => {
+
 		fs.readFile(filePath, 'utf8', function(error, response) {
-			if(error){
-				reject('we have no files');
-			}else{
-				resolve(response);
-			}
+
+			error ?	reject('we have no files') : resolve(response);
+
 		})
+
 	} );
+
 }
 
-function saveFile () {
+/**
+	* @name getFileContent
+	* @desc read files content
+	* @param {string} filePath - adress of file thet need to read
+	* @return {string} - file content in string 
+	*/
+function saveFile (filePath, content) {
+
+	return new Promise( (resolve, reject) => {
+
+		fs.open(filePath, 'w+', function(err, document) {
+		  if (err) throw 'error opening file: ' + err;
+
+		  let buffer = new Buffer(content);
+
+		  fs.write(document, buffer, 0, buffer.length, null, function(err) {
+		      if (err) throw 'error writing file: ' + err;
+
+		      fs.close(document, function() {
+		      	resolve('all is fine');
+		        console.log(`${filePath} - file written`);
+		      })
+
+		  });
+
+		});
+
+	} )
 
 }
 
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
-		fs.access(path, (error) => {
+		fs.access(folderPath, (error) => {
 			if (error) {
 				console.log('there is no "_docs" folder, please add it to continue work');
 				reject();
@@ -78,6 +90,54 @@ function getFilesNames(path){
 	} );
 } 
 
+function generateNewContent(menu, content){
+
+	return new Promise( (resolve, reject) => {
+		
+		let $ = cheerio.load(content);
+
+		let body = $('body').html();
+
+		$('body').children().remove();
+
+		let columns = '<aside class="menu"></aside><section class="content"></section>'
+
+		$('body').append(columns);
+		$('.menu').append(menu);
+		$('.content').append(body);
+
+		resolve($.html());
+
+	} );
+
+}
+
+function syncNewDirectory(path){
+	return new Promise( (resolve, reject) => {
+
+		fs.access(path, (error) => {
+
+			if (error) {
+
+				console.log('there is no "docs" folder, please add it to continue work');
+
+				fs.mkdir(path, (error)=>{
+					if(error){
+						console.log('cant create "docs" directory');
+						reject();
+					}
+					resolve();
+				})
+
+			}
+
+			resolve();
+
+		});
+
+	} );
+}
+
 async function generateFiles (filesNames) {
 
 	let htmlFilesNames = filesNames
@@ -89,72 +149,32 @@ async function generateFiles (filesNames) {
 
 	for (let i=0; i<htmlFilesNames.length; i++) {
 
-		let filePath = `${path}/${htmlFilesNames[i]}`;
+		let filePath = `${resPath}/${htmlFilesNames[i]}`;
+		let newFilePath = `${finalPath}/${htmlFilesNames[i]}`;
 
-		let fileContent = await getFileDom(filePath);
+		let fileContent = await getFileContent(filePath);
 
-		let $ = cheerio.load(fileContent);
+		let newFileContent = await generateNewContent(menu, fileContent);
 
-		let body = $('body').html();
+		await syncNewDirectory(finalPath);
 
-		$('body').children().remove();
-		let columns = '<aside class="menu"></aside><srction class="content"></srction>'
-		$('body').append(columns);
-		$('.menu').append(menu);
-		$('.content').append(body);
-		console.log($.html());
+		try {
+			await saveFile(newFilePath, newFileContent);
+		}catch(e){
+			console.log(`${filePath} didn't saved`);
+		}
 
 	}
-
-	return 'cool'
 }
 
-isFolderExist(path).then(_=>{
+isFolderExist(resPath).then(_=>{
 
-	getFilesNames(path).then( filesNames => {
+	getFilesNames(resPath).then( filesNames => {
 
-		generateFiles(filesNames).then( ()=>{
+		generateFiles(filesNames).then(_=>{
 			console.log('all is cool');
 		} );
 
 	})
 
 });
-
-
-
-// fs.readdir(path, function(err, items) {
-
-// 	items.forEach( item => {
-// 		menuItems.push(item);
-// 	} );
-
-// 	menu = items
-// 	.filter( fileName => pathLib.parse(fileName).ext === '.html' )
-// 	.reduce( ( a, b ) => {
-// 		return `${a}<li><a href="${b}">${pathLib.parse(b).name}</a></li>`;
-// 	}, '<ul>' ) + '</ul>';
-
-// 	console.log(menu);
-
-// 	items
-// 	.filter( fileName => fileName.substr(-5) === '.html' )
-// 	.forEach( item => {
-
-// 		getFileDom(path+item).then(response => {
-// 			$ = cheerio.load(response);
-// 			let body = $('body').html();
-// 			$('body').children().remove();
-// 			let columns = '<aside class="menu"></aside><srction class="content"></srction>'
-// 			$('body').append(columns);
-// 			$('.menu').append(menu);
-// 			$('.content').append(body);
-// 			console.log($.html());
-// 		}, error => {
-// 			console.log('bad');
-// 		})
-
-// 	} );
-	
-// 	console.log(menuItems);
-// });
