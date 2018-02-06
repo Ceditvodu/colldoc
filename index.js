@@ -134,7 +134,7 @@ function generateMenu(filesNames, activeItem){
 	let menu = filesNames.reduce( ( a, b ) => {
 			let active = activeItem === b ? 'active' : '';
 			return `${a}<li class="${active}"><a href="${b}">${pathLib.parse(b).name}</a></li>`;
-		}, '<ul>' ) + '</ul>';
+		}, '<nav class="menu"><ul>' ) + '</ul></nav>';
 	return menu;
 }
 
