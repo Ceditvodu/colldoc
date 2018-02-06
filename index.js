@@ -23,17 +23,11 @@ const	finalPath = path + 'docs';
 	* @return {string} - file content in string 
 	*/
 function getFileContent (filePath) {
-
 	return new Promise( (resolve,reject) => {
-
 		fs.readFile(filePath, 'utf8', function(error, response) {
-
 			error ?	reject('we have no files') : resolve(response);
-
 		})
-
 	} );
-
 }
 
 /**
@@ -82,9 +76,7 @@ function isFolderExist(folderPath){
 function getFilesNames(path){
 	return new Promise( (resolve, reject) => {
 		fs.readdir(path, function(error, items) {
-			if (error){
-				reject();
-			}
+			if (error) reject();
 			resolve(items);
 		});
 	} );
@@ -100,7 +92,7 @@ function generateNewContent(menu, content){
 
 		$('body').children().remove();
 
-		let columns = '<aside class="menu"></aside><section class="content"></section>'
+		let columns = '<aside class="menu"></aside><section class="content"></section>';
 
 		$('body').append(columns);
 		$('.menu').append(menu);
@@ -138,16 +130,23 @@ function syncNewDirectory(path){
 	} );
 }
 
+function generateMenu(filesNames, activeItem){
+	let menu = filesNames.reduce( ( a, b ) => {
+			let active = activeItem === b ? 'active' : '';
+			return `${a}<li class="${active}"><a href="${b}">${pathLib.parse(b).name}</a></li>`;
+		}, '<ul>' ) + '</ul>';
+	return menu;
+}
+
 async function generateFiles (filesNames) {
 
 	let htmlFilesNames = filesNames
 	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
 	
-	let menu = htmlFilesNames.reduce( ( a, b ) => {
-		return `${a}<li><a href="${b}">${pathLib.parse(b).name}</a></li>`;
-	}, '<ul>' ) + '</ul>';
 
 	for (let i=0; i<htmlFilesNames.length; i++) {
+
+		let menu = generateMenu(htmlFilesNames, htmlFilesNames[i]);
 
 		let filePath = `${resPath}/${htmlFilesNames[i]}`;
 		let newFilePath = `${finalPath}/${htmlFilesNames[i]}`;
