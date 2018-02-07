@@ -25,35 +25,46 @@ const	finalPath = path + 'docs';
 function getFileContent (filePath) {
 	return new Promise( (resolve,reject) => {
 		fs.readFile(filePath, 'utf8', function(error, response) {
-			error ?	reject('we have no files') : resolve(response);
+			error ?	reject( 'we have no files' + error ) : resolve(response);
 		})
 	} );
 }
 
 /**
-	* @name getFileContent
-	* @desc read files content
-	* @param {string} filePath - adress of file thet need to read
-	* @return {string} - file content in string 
+	* @name saveFile
+	* @desc save content to file, or update it, or create new file.
+	* @param {string} filePath - adress of file in what must be saved content.
+	* @param {string} content - content that must be writen in file.
 	*/
 function saveFile (filePath, content) {
 
 	return new Promise( (resolve, reject) => {
 
-		fs.open(filePath, 'w+', function(err, document) {
-		  if (err) throw 'error opening file: ' + err;
+		fs.open(filePath, 'w+', function(error, document) {
 
-		  let buffer = new Buffer(content);
+		  if (error){
 
-		  fs.write(document, buffer, 0, buffer.length, null, function(err) {
-		      if (err) throw 'error writing file: ' + err;
+	    	console.log(`${filePath} - file didn't written (check file permissions)`);
+	    	resolve();
 
-		      fs.close(document, function() {
-		      	resolve('all is fine');
-		        console.log(`${filePath} - file written`);
-		      })
+		  }else{
 
-		  });
+			  let buffer = new Buffer(content);
+
+			  fs.write(document, buffer, 0, buffer.length, null, function(error) {
+			      if (error) {
+				    	console.log(`${filePath} - file didn't written`);
+			      	resolve();
+			      }
+
+			      fs.close(document, function() {
+			        console.log(`${filePath} - file written`);
+			      	resolve();
+			      })
+
+			  });
+
+		  }
 
 		});
 
@@ -61,26 +72,40 @@ function saveFile (filePath, content) {
 
 }
 
+/**
+	* @function
+	* @name isFolderExist
+	* @param {string} folderPath - path that must be insured.
+	*/
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
 		fs.access(folderPath, (error) => {
 			if (error) {
 				console.log('there is no "_docs" folder, please add it to continue work');
-				reject();
+				throw error;
 			}
+			
 			resolve();
 		});
 	} );
 }
 
+/**
+	* @function
+	* @name getFilesNames
+	* @desc get list of files from folder.
+	* @param {string} path - folder path that contain files.
+	* @return {array} - list of files names.
+	*/
 function getFilesNames(path){
 	return new Promise( (resolve, reject) => {
 		fs.readdir(path, function(error, items) {
-			if (error) reject();
+			if (error) throw error;
 			resolve(items);
 		});
 	} );
 } 
+
 
 function generateNewContent(menu, content){
 
@@ -107,16 +132,17 @@ function generateNewContent(menu, content){
 function syncNewDirectory(path){
 	return new Promise( (resolve, reject) => {
 
-		fs.access(path, (error) => {
+		fs.access(path, error => {
 
 			if (error) {
 
 				console.log('there is no "docs" folder, please add it to continue work');
 
-				fs.mkdir(path, (error)=>{
+				fs.mkdir(path, error => {
 					if(error){
 						console.log('cant create "docs" directory');
-						reject();
+						reject(error);
+						throw error;
 					}
 					resolve();
 				})
@@ -144,15 +170,14 @@ async function generateFiles (filesNames) {
 	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
 	
 
-	for (let i=0; i<htmlFilesNames.length; i++) {
+	for (let htmlFilesName of htmlFilesNames) {
 
-		let menu = generateMenu(htmlFilesNames, htmlFilesNames[i]);
+		let menu = generateMenu(htmlFilesNames, htmlFilesName);
 
-		let filePath = `${resPath}/${htmlFilesNames[i]}`;
-		let newFilePath = `${finalPath}/${htmlFilesNames[i]}`;
+		let filePath = `${resPath}/${htmlFilesName}`;
+		let newFilePath = `${finalPath}/${htmlFilesName}`;
 
 		let fileContent = await getFileContent(filePath);
-
 		let newFileContent = await generateNewContent(menu, fileContent);
 
 		await syncNewDirectory(finalPath);
