@@ -15,6 +15,86 @@ if (process.argv.length <= 2) {
 const path = process.argv[2];
 const resPath = path + '_docs';
 const	finalPath = path + 'docs';
+
+function getColor(color){
+	let colorMap = {
+		reset : "\x1b[0m",
+		dim : "\x1b[2m",
+
+		frontBlack : "\x1b[30m",
+		frontRed : "\x1b[31m",
+		frontGreen : "\x1b[32m",
+		frontYellow : "\x1b[33m",
+		frontBlue : "\x1b[34m",
+		frontMagenta : "\x1b[35m",
+		frontCyan : "\x1b[36m",
+		frontWhite : "\x1b[37m",
+
+		backBlack : "\x1b[40m",
+		backRed : "\x1b[41m",
+		backGreen : "\x1b[42m",
+		backYellow : "\x1b[43m",
+		backBlue : "\x1b[44m",
+		backMagenta : "\x1b[45m",
+		backCyan : "\x1b[46m",
+		backWhite : "\x1b[47m",
+	}	
+	return colorMap[color] || colorMap['reset'];
+}
+
+function successMessage(message){
+	console.log(
+		getColor('backCyan'), 
+		getColor('frontBlack'), 
+		'♫',
+		getColor('backBlack')+
+		getColor('frontCyan')+
+		'►',
+		message, 
+		getColor('reset')
+	);
+}
+
+function infoMessage(message){
+	console.log(
+		getColor('backGreen'), 
+		getColor('frontBlack'), 
+		'?',
+		getColor('backBlack')+
+		getColor('frontGreen')+
+		'►',
+		message, 
+		getColor('reset')
+	);
+}
+
+function warningMessage(message){
+	console.log(
+		getColor('backYellow'), 
+		getColor('frontBlack'), 
+		'!',
+		getColor('backBlack')+
+		getColor('frontYellow')+
+		'►',
+		message, 
+		getColor('reset')
+	);
+}
+
+function errorMessage(message, error){
+	console.log(
+		getColor('backRed'), 
+		getColor('frontBlack'), 
+		'‼',
+		getColor('backBlack')+
+		getColor('frontRed')+
+		'►',
+		message, 
+		'\n',
+		error.message,
+		getColor('reset')
+	);
+}
  
 /**
 	* @name getFileContent
@@ -44,8 +124,8 @@ function saveFile (filePath, content) {
 
 		  if (error){
 
-	    	console.log(`${filePath} - file didn't written (check file permissions)`);
-	    	resolve();
+	    	warningMessage(`${filePath} - file didn't written (check file permissions)`);
+	    	reject();
 
 		  }else{
 
@@ -53,12 +133,12 @@ function saveFile (filePath, content) {
 
 			  fs.write(document, buffer, 0, buffer.length, null, function(error) {
 			      if (error) {
-				    	console.log(`${filePath} - file didn't written`);
+				    	warningMessage(`${filePath} - file didn't written (check file permissions)`);
 			      	resolve();
 			      }
 
 			      fs.close(document, function() {
-			        console.log(`${filePath} - file written`);
+			      	successMessage(`${filePath} - file written`)
 			      	resolve();
 			      })
 
@@ -80,12 +160,7 @@ function saveFile (filePath, content) {
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
 		fs.access(folderPath, (error) => {
-			if (error) {
-				console.log('there is no "_docs" folder, please add it to continue work');
-				throw error;
-			}
-			
-			resolve();
+			error ? errorMessage('there is no "_docs" folder, please add it to continue work', error) : resolve();
 		});
 	} );
 }
@@ -100,8 +175,7 @@ function isFolderExist(folderPath){
 function getFilesNames(path){
 	return new Promise( (resolve, reject) => {
 		fs.readdir(path, function(error, items) {
-			if (error) throw error;
-			resolve(items);
+			error ? errorMessage('',error) : resolve(items);
 		});
 	} );
 } 
@@ -136,15 +210,10 @@ function syncNewDirectory(path){
 
 			if (error) {
 
-				console.log('there is no "docs" folder, please add it to continue work');
+				errorMessage('there is no "docs" folder, please add it to continue work', error);
 
 				fs.mkdir(path, error => {
-					if(error){
-						console.log('cant create "docs" directory');
-						reject(error);
-						throw error;
-					}
-					resolve();
+					error ? errorMessage('cant create "docs" directory', error) : resolve();
 				})
 
 			}
@@ -169,6 +238,10 @@ async function generateFiles (filesNames) {
 	let htmlFilesNames = filesNames
 	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
 	
+	let info = {
+		succed: 0,
+		failed: 0,
+	};
 
 	for (let htmlFilesName of htmlFilesNames) {
 
@@ -184,19 +257,21 @@ async function generateFiles (filesNames) {
 
 		try {
 			await saveFile(newFilePath, newFileContent);
-		}catch(e){
-			console.log(`${filePath} didn't saved`);
+			info.succed = ++info.succed;
+		}catch(error){
+			info.failed = ++info.failed;
 		}
 
 	}
+	return(info);
 }
 
-isFolderExist(resPath).then(_=>{
+isFolderExist(resPath).then( _ =>{
 
 	getFilesNames(resPath).then( filesNames => {
 
-		generateFiles(filesNames).then(_=>{
-			console.log('all is cool');
+		generateFiles(filesNames).then( info =>{
+			infoMessage(`Files written: ${info.succed}, failed: ${info.failed} `);
 		} );
 
 	})
