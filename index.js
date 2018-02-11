@@ -16,6 +16,14 @@ const path = process.argv[2];
 const resPath = path + '_docs';
 const	finalPath = path + 'docs';
 
+/**
+	* @function
+	* @name getColor
+	* @desc filling some colors to comand line
+	* @param {string} color - name of color that it hase next syntacs:
+	* {font|back}{colorName}
+	* @return {string} - color code copitable with comande line.
+	*/
 function getColor(color){
 	let colorMap = {
 		reset : "\x1b[0m",
@@ -42,6 +50,9 @@ function getColor(color){
 	return colorMap[color] || colorMap['reset'];
 }
 
+/**
+	*
+	*/
 function successMessage(message){
 	console.log(
 		getColor('backCyan'), 
@@ -160,7 +171,7 @@ function saveFile (filePath, content) {
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
 		fs.access(folderPath, (error) => {
-			error ? errorMessage('there is no "_docs" folder, please add it to continue work', error) : resolve();
+			error ? errorMessage('there is no "_docs" folder, please add it to continue work', error) : resolve(true);
 		});
 	} );
 }
@@ -255,25 +266,35 @@ async function generateFiles (filesNames) {
 
 		await syncNewDirectory(finalPath);
 
-		try {
-			await saveFile(newFilePath, newFileContent);
-			info.succed = ++info.succed;
-		}catch(error){
-			info.failed = ++info.failed;
-		}
+		await saveFile(newFilePath, newFileContent)
+			.then( _ => info.succed = ++info.succed )
+			.catch( error => info.failed = ++info.failed );
 
 	}
+
 	return(info);
 }
 
-isFolderExist(resPath).then( _ =>{
+/**
+	* @function
+	* @name colldoc
+	* @desc init function that generates menu in html files.
+	* @author Ivan Kaduk
+	* @licence MIT 2018
+	*/
+async function colldoc() {
 
-	getFilesNames(resPath).then( filesNames => {
+	let filesNames = await isFolderExist(resPath) ?
+		await getFilesNames(resPath) : [];
 
-		generateFiles(filesNames).then( info =>{
-			infoMessage(`Files written: ${info.succed}, failed: ${info.failed} `);
-		} );
+	let statistic = await generateFiles(filesNames);
+  
+  infoMessage(`Files: 
+  	written - ${statistic.succed}, 
+  	failed - ${statistic.failed}`);
 
-	})
+}
 
-});
+colldoc();
+
+
