@@ -4,7 +4,7 @@
   "description": "document collector for simple html pages",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --require ./colldoc.js"
   },
   "repository": {
     "type": "git",
