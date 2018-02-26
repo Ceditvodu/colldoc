@@ -177,15 +177,20 @@ function confirmMessage(message) {
   } );
 }
  
+/**
+  * @function
+  * @name stop
+  * @desc Canceling application.
+  */
 function stop() {
   process.exit(-1);
 }
 
 /**
 	* @name getFileContent
-	* @desc read files content
-	* @param {string} filePath - adress of file thet need to read
-	* @return {string} - file content in string 
+	* @desc read files content.
+	* @param {string} filePath - adress of file thet need to read.
+	* @return {string} - file content in string. 
 	*/
 function getFileContent (filePath) {
 	return new Promise( (resolve,reject) => {
@@ -199,7 +204,8 @@ function getFileContent (filePath) {
 	* @name saveFile
 	* @desc save content to file, or update it, or create new file.
 	* @param {string} filePath - adress of file in what must be saved content.
-	* @param {string} content - content that must be writen in file.
+  * @param {string} content - content that must be writen in file.
+  * @return {boolean} - flag that tells that file is saved.
 	*/
 function saveFile (filePath, content) {
 
@@ -219,12 +225,12 @@ function saveFile (filePath, content) {
 			  fs.write(document, buffer, 0, buffer.length, null, function(error) {
 			      if (error) {
 				    	warningMessage(`${filePath} - file didn't written (check file permissions)`);
-			      	resolve();
+			      	resolve(true);
 			      }
 
 			      fs.close(document, function() {
 			      	successMessage(`${filePath} - file written`)
-			      	resolve();
+			      	resolve(true);
 			      })
 
 			  });
@@ -240,12 +246,15 @@ function saveFile (filePath, content) {
 /**
 	* @function
 	* @name isFolderExist
-	* @param {string} folderPath - path that must be insured.
+  * @param {string} folderPath - path that must be insured.
+  * @return {boolean} - flag that means that folder exist.
 	*/
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
 		fs.access(folderPath, (error) => {
-			error ? errorMessage('there is no "_docs" folder, please add it to continue work', error) : resolve(true);
+      error ? 
+        errorMessage('there is no "_docs" folder, please add it to continue work', error) : 
+        resolve(true);
 		});
 	} );
 }
@@ -265,7 +274,14 @@ function getFilesNames(path){
 	} );
 } 
 
-
+/**
+	* @function
+	* @name generateNewContent
+	* @desc generate html with addition container and side menu.
+	* @param {string} menu - html menu according files that in folder.
+	* @param {string} content - html file content.
+	* @return {string} - new content with additional container and navigation.
+	*/
 function generateNewContent(menu, content){
 
 	return new Promise( (resolve, reject) => {
@@ -288,6 +304,13 @@ function generateNewContent(menu, content){
 
 }
 
+/**
+	* @function
+	* @name syncNewDirectory
+	* @desc Check if folder exist and if it not it will create it.
+	* @param {string} path - expected new folder path.
+	* @return {string} - flag that means that folder exist.
+	*/
 function syncNewDirectory(path){
 	return new Promise( (resolve, reject) => {
 
@@ -298,18 +321,26 @@ function syncNewDirectory(path){
 				errorMessage('there is no "docs" folder, please add it to continue work', error);
 
 				fs.mkdir(path, error => {
-					error ? errorMessage('cant create "docs" directory', error) : resolve();
+					error ? errorMessage('cant create "docs" directory', error) : resolve(true);
 				})
 
 			}
 
-			resolve();
+			resolve(true);
 
 		});
 
 	} );
 }
 
+/**
+	* @function
+	* @name generateMenu
+	* @desc Html menu generator according list of files and active item.
+  * @param {array} filesNames - list of files names.
+  * @param {string} activeItem - name of file which is currently open.
+	* @return {string} - html menu.
+	*/
 function generateMenu(filesNames, activeItem){
 	let menu = filesNames.reduce( ( a, b ) => {
 			let active = activeItem === b ? 'active' : '';
@@ -318,6 +349,14 @@ function generateMenu(filesNames, activeItem){
 	return menu;
 }
 
+/**
+	* @function
+	* @name generateFiles
+	* @desc Making actions from checking if all exist to generating and saving files.
+  * @param {array} filesNames - list of files names.
+  * @return {object} - json entity that contains information of how much files was written
+  * and how much failed.
+	*/
 async function generateFiles (filesNames) {
 
 	let htmlFilesNames = filesNames
