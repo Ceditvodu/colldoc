@@ -5,10 +5,11 @@
 const fs = require('fs');
 const cheerio = require('cheerio');
 const pathLib = require('path');
+const rl = require('readline');
 
 if (process.argv.length <= 2) {
-    console.log("Usage: " + __filename + " path/to/directory");
-    process.exit(-1);
+  console.log("Usage: " + __filename + " path/to/directory");
+  stop();
 }
  
 const path = process.argv[2];
@@ -52,11 +53,11 @@ function getColor(color){
 /**
 	* @function
 	* @name successMessage
-	* @desc shows succes message it is looks like blue line with message and note 
+	* @desc shows succes message it looks like blue line with message and note 
 	* on start.
 	* @param {string} message - stringe that must be shown in cli as a success 
 	* message.
-	* return {boolean} - flag that means that message was shown. 
+	* @return {boolean} - flag that means that message was shown. 
 	*/
 function successMessage(message){
 	console.log(
@@ -72,6 +73,14 @@ function successMessage(message){
 	return true;
 }
 
+/**
+	* @function
+	* @name infoMessage
+	* @desc shows some informational message it looks like green line with message.
+	* @param {string} message - stringe that must be shown in cli as a info 
+	* message.
+	* @return {boolean} - flag that means that message was shown. 
+	*/
 function infoMessage(message){
 	console.log(
 		getColor('backGreen'), 
@@ -82,9 +91,18 @@ function infoMessage(message){
 		'►',
 		message, 
 		getColor('reset')
-	);
+  );
+  return true;
 }
 
+/**
+	* @function
+	* @name warningMessage
+	* @desc shows some warning message it looks like yellow line with message.
+	* @param {string} message - stringe that must be shown in cli as a warning 
+	* message.
+	* @return {boolean} - flag that means that message was shown. 
+	*/
 function warningMessage(message){
 	console.log(
 		getColor('backYellow'), 
@@ -95,9 +113,19 @@ function warningMessage(message){
 		'►',
 		message, 
 		getColor('reset')
-	);
+  );
+  return true;
 }
 
+/**
+  * @function
+  * @name errorMessage
+  * @desc shows some error message it looks like red line with message.
+  * Also it shows error message
+  * @param {string} message - stringe that must be shown in cli as a error 
+  * message.
+  * @return {boolean} - flag that means that message was shown. 
+  */
 function errorMessage(message, error){
 	console.log(
 		getColor('backRed'), 
@@ -113,10 +141,46 @@ function errorMessage(message, error){
 	);
 }
 
+
+/**
+  * @function
+  * @name errorMessage
+  * @desc shows some error message it looks like red line with message.
+  * Also it shows error message
+  * @param {string} message - stringe that must be shown in cli as a error 
+  * message.
+  * @return {boolean} - flag that means that message was shown. 
+  */
 function confirmMessage(message) {
-	
+
+  let ask = rl.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  
+  let styledMessage = '' +
+    getColor('backMagenta') + '  ' + 
+		getColor('frontBlack') + 
+		'? ' +
+		getColor('backBlack') +
+		getColor('frontMagenta') +
+		'► ' +
+		message + 
+		getColor('reset');
+    
+  return new Promise( (resolve, reject) => {
+    ask.question(`${styledMessage} (y/n) \n`, answer => {
+      answer === 'y' ?
+        resolve() : reject();
+      ask.close();
+    });
+  } );
 }
  
+function stop() {
+  process.exit(-1);
+}
+
 /**
 	* @name getFileContent
 	* @desc read files content
@@ -257,7 +321,7 @@ function generateMenu(filesNames, activeItem){
 async function generateFiles (filesNames) {
 
 	let htmlFilesNames = filesNames
-	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
+  	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
 	
 	let info = {
 		succed: 0,
@@ -267,7 +331,8 @@ async function generateFiles (filesNames) {
 	await syncNewDirectory(finalPath);
 
 	resPath === finalPath && 
-		await confirmMessage('Do you realy whant to rewrite init files?'); 
+    await confirmMessage('Do you realy whant to rewrite init files?')
+      .catch( e => stop() ); 
 
 	for (let htmlFilesName of htmlFilesNames) {
 
@@ -306,6 +371,7 @@ async function colldoc() {
   	written - ${statistic.succed}, 
   	failed - ${statistic.failed}`);
 
+    stop();
 }
 
 module.exports = colldoc; 

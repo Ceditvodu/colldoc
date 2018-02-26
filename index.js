@@ -2,4 +2,4 @@
 'use strict!';
 const colldoc = require('./colldoc');
 
-colldoc.colldoc();
+colldoc();
