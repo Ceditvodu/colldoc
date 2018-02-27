@@ -27,9 +27,9 @@ describe('colldoc', function() {
 
     });
 
-    it('must throw an error', function () {
+    it('must throw an error if there is no such file', function () {
 
-      Promise.resolve(colldoc.getFileContent('./sandbox/k.html'))
+      Promise.resolve(colldoc.getFileContent('./sandbox/goust.html'))
         .then(_=> assert.fail())
         .catch(_=>assert.ok('error'));
 
