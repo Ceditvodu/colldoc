@@ -1,8 +1,10 @@
+'use strict';
+
 const assert = require('assert');
 const colldoc = require('../colldoc.js');
 
 describe('colldoc', function() {
-	describe('#getColor()', function() {
+	describe('#getColor', function() {
 
 		it('should return string with reset code', function() {
 			assert.equal(colldoc.getColor('1'), '\x1b[0m');
@@ -12,6 +14,27 @@ describe('colldoc', function() {
 			assert.equal(colldoc.getColor('frontBlack'), '\x1b[30m');
 		} );
 
-	} );
+  } );
+  
+  describe('#getFileContent', function(){
+
+    it('should return file content with "hello" inside', function () {
+
+      Promise.resolve(colldoc.getFileContent('./sandbox/hello_content.html'))
+        .then(result => {
+          assert.equal(result, 'hello');
+        });
+
+    });
+
+    it('must throw an error', function () {
+
+      Promise.resolve(colldoc.getFileContent('./sandbox/k.html'))
+        .then(_=> assert.fail())
+        .catch(_=>assert.ok('error'));
+
+    });
+
+  });
 } );
 

@@ -171,7 +171,7 @@ function confirmMessage(message) {
   return new Promise( (resolve, reject) => {
     ask.question(`${styledMessage} (y/n) \n`, answer => {
       answer === 'y' ?
-        resolve() : reject();
+        resolve(true) : reject();
       ask.close();
     });
   } );
@@ -416,3 +416,4 @@ async function colldoc() {
 module.exports = colldoc; 
 module.exports.getColor = getColor;
 module.exports.successMessage = successMessage;
+module.exports.getFileContent = getFileContent;
