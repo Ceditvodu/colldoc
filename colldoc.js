@@ -334,15 +334,14 @@ function syncNewDirectory(path){
   return path && new Promise( (resolve, reject) => {
     fs.access(path, error => {
       if (error) {
-
-        errorMessage('there is no "docs" folder, please add it to continue work', error);
-
+        
         fs.mkdir(path, error => {
-
+          
           error ? errorMessage('cant create "docs" directory', error) : resolve(true);
           
         })
-
+        
+        errorMessage('there is no "docs" folder, please add it to continue work', error);
       }
 
       resolve(true);
