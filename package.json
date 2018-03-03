@@ -1,14 +1,14 @@
 {
   "name": "colldoc",
-  "version": "1.0.0",
-  "description": "document collector for simple html pages",
+  "version": "1.0.1",
+  "description": "document collector that use simple html pages",
   "main": "index.js",
   "scripts": {
     "test": "mocha --require ./colldoc.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://ivan_kaduk@bitbucket.org/ivan_kaduk/colldoc.git"
+    "url": "git+https://github.com/Ceditvodu/colldoc.git"
   },
   "keywords": [
     "documentation",
@@ -18,10 +18,9 @@
   ],
   "author": "Ivan Kaduk",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/ivan_kaduk/colldoc#readme",
+  "homepage": "https://github.com/Ceditvodu/colldoc",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "commander": "^2.13.0"
+    "cheerio": "^1.0.0-rc.2"
   },
   "preferGlobal": true,
   "bin": "index.js"

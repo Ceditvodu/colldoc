@@ -5,16 +5,15 @@
   * - add ability to choose folders
   * - order functional
   */
-const fs = require('fs');
-const cheerio = require('cheerio');
-const pathLib = require('path');
-const rl = require('readline');
-
 if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
   stop();
 }
 
+const fs = require('fs');
+const cheerio = require('cheerio');
+const pathLib = require('path');
+const rl = require('readline');
 const path = process.argv[2];
 
 /**
@@ -241,7 +240,6 @@ function saveFile (filePath, content = '') {
   return filePath && new Promise( (resolve, reject) => {
 
     fs.open(filePath, 'w+', function(error, document) {
-
       if (error){
 
         warningMessage(`${filePath} - file didn\'t written (check file permissions)`);
@@ -250,26 +248,20 @@ function saveFile (filePath, content = '') {
       }else{
 
         let buffer = new Buffer(content);
-
         fs.write(document, buffer, 0, buffer.length, null, function(error) {
-            if (error) {
-              warningMessage(`${filePath} - `);
-              resolve(true);
-            }
-
-            fs.close(document, function() {
-              successMessage(`${filePath} - file written`)
-              resolve(true);
-            })
-
+          if (error) {
+            warningMessage(`${filePath} - `);
+            resolve(true);
+          }
+          fs.close(document, function() {
+            successMessage(`${filePath} - file written`)
+            resolve(true);
+          })
         });
 
       }
-
     });
-
   } )
-
 }
 
 /**
@@ -318,11 +310,9 @@ function generateNewContent(menu = '', content = ''){
     let $ = cheerio.load(content);
 
     let body = $('body').html();
-
     $('body').children().remove();
 
     let columns = '<aside class="menu"></aside><section class="content"></section>';
-
     $('body').append(columns);
     $('.menu').append(menu);
     $('.content').append(body);
@@ -342,15 +332,15 @@ function generateNewContent(menu = '', content = ''){
   */
 function syncNewDirectory(path){
   return path && new Promise( (resolve, reject) => {
-
     fs.access(path, error => {
-
       if (error) {
 
         errorMessage('there is no "docs" folder, please add it to continue work', error);
 
         fs.mkdir(path, error => {
+
           error ? errorMessage('cant create "docs" directory', error) : resolve(true);
+          
         })
 
       }
@@ -358,7 +348,6 @@ function syncNewDirectory(path){
       resolve(true);
 
     });
-
   } );
 }
 
