@@ -20,5 +20,5 @@ Colldoc is a Cli tool that helps you build documentaion. To say more clear it si
 - [X] choosing own names of folders
 - [X] log messages to consol
 - [X] pormpt for asking questions
-- [ ] sorting first on numbers then on 
+- [ ] sorting first on numbers then on letters
 - [ ] adding file name in file as a html title
