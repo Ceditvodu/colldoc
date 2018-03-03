@@ -197,12 +197,24 @@ function stop() {
   * resource path.
   * @returns {string} - path to resource files.
   */
+function getResourcePath() {
+	return (process.argv.length >= 4) ?
+		process.argv.length[3] :
+		'_docs';
+}
+
 /** 
   * @function
   * @name getFinalPath
   * @description gets fours parameter from process as final path.
   * @returns {string} - path to result files.
   */
+function getFinalPath() {
+	return (process.argv.length >= 5) ?
+		process.argv.length[4] :
+		'docs';
+}
+
 /**
 	* @name getFileContent
 	* @description read files content.
@@ -299,7 +311,7 @@ function getFilesNames(path){
 	* @param {string} content - html file content.
 	* @returns {string} - new content with additional container and navigation.
 	*/
-function generateNewContent(menu, content){
+function generateNewContent(menu = '', content = ''){
 
 	return new Promise( (resolve, reject) => {
 		
@@ -358,7 +370,7 @@ function syncNewDirectory(path){
   * @param {string} activeItem - name of file which is currently open.
 	* @returns {string} - html menu.
 	*/
-function generateMenu(filesNames, activeItem){
+function generateMenu(filesNames = [], activeItem = ''){
 	let menu = filesNames.reduce( ( a, b ) => {
 			let active = activeItem === b ? 'active' : '';
 			return `${a}<li class="${active}"><a href="${b}">${pathLib.parse(b).name}</a></li>`;
@@ -417,6 +429,9 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
 	* @licence MIT 2018
 	*/
 async function colldoc() {
+
+	let resPath = getResourcePath();
+	let finalPath = getFinalPath();
 
 	let filesNames = await isFolderExist(resPath) ?
 		await getFilesNames(resPath) : [];
