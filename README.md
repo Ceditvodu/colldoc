@@ -12,9 +12,9 @@ Colldoc is a Cli tool that helps you build documentaion. To say more clear it si
 
 ### Todo ###
 
-[+] make a copy of your files with navigation
-[+] choosing own names of folders
-[+] log messages to consol
-[+] pormpt for asking questions
-[-] sorting first on numbers then on 
-[-] adding file name in file as a html title
+- [X] make a copy of your files with navigation
+- [X] choosing own names of folders
+- [X] log messages to consol
+- [X] pormpt for asking questions
+- [ ] sorting first on numbers then on 
+- [ ] adding file name in file as a html title
