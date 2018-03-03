@@ -16,8 +16,6 @@ if (process.argv.length <= 2) {
 }
 
 const path = process.argv[2];
-const resPath = path + '_docs';
-const	finalPath = path + 'docs';
 
 /**
 	* @function
@@ -62,7 +60,7 @@ function getColor(color){
 	* message.
 	* @returns {boolean} - flag that means that message was shown. 
 	*/
-function successMessage(message){
+function successMessage(message = ''){
 	console.log(
 		getColor('backCyan'), 
 		getColor('frontBlack'), 
@@ -85,7 +83,7 @@ function successMessage(message){
 	* message.
 	* @returns {boolean} - flag that means that message was shown. 
 	*/
-function infoMessage(message){
+function infoMessage(message = ''){
 	console.log(
 		getColor('backGreen'), 
 		getColor('frontBlack'), 
@@ -108,7 +106,7 @@ function infoMessage(message){
 	* message.
 	* @returns {boolean} - flag that means that message was shown. 
 	*/
-function warningMessage(message){
+function warningMessage(message = ''){
 	console.log(
 		getColor('backYellow'), 
 		getColor('frontBlack'), 
@@ -131,7 +129,9 @@ function warningMessage(message){
   * message.
   * @returns {boolean} - flag that means that message was shown. 
   */
-function errorMessage(message, error){
+function errorMessage(message = '', error){
+  let errorMessage = error ? error.message : '';
+
 	console.log(
 		getColor('backRed'), 
 		getColor('frontBlack'), 
@@ -141,7 +141,7 @@ function errorMessage(message, error){
 		'►',
 		message, 
 		'\n',
-		error.message,
+		errorMessage,
 		getColor('reset')
 	);
 }
@@ -155,7 +155,7 @@ function errorMessage(message, error){
   * message.
   * @returns {boolean} - flag that means that message was shown. 
   */
-function confirmMessage(message) {
+function confirmMessage(message = 'do yo whant to continue') {
 
   let ask = rl.createInterface({
     input: process.stdin,
@@ -210,7 +210,7 @@ function stop() {
 	* @returns {string} - file content in string. 
 	*/
 function getFileContent (filePath) {
-	return new Promise( (resolve,reject) => {
+  return filePath && new Promise( (resolve,reject) => {
 		fs.readFile(filePath, 'utf8', function(error, response) {
 			error ?	reject( 'we have no files' + error ) : resolve(response);
 		})
@@ -224,15 +224,15 @@ function getFileContent (filePath) {
   * @param {string} content - content that must be writen in file.
   * @returns {boolean} - flag that tells that file is saved.
 	*/
-function saveFile (filePath, content) {
+function saveFile (filePath, content = '') {
 
-	return new Promise( (resolve, reject) => {
+  return filePath && new Promise( (resolve, reject) => {
 
 		fs.open(filePath, 'w+', function(error, document) {
 
 		  if (error){
 
-	    	warningMessage(`${filePath} - file didn't written (check file permissions)`);
+				warningMessage(`${filePath} - file didn\'t written (check file permissions)`);
 	    	reject();
 
 		  }else{
@@ -241,7 +241,7 @@ function saveFile (filePath, content) {
 
 			  fs.write(document, buffer, 0, buffer.length, null, function(error) {
 			      if (error) {
-				    	warningMessage(`${filePath} - file didn't written (check file permissions)`);
+				    	warningMessage(`${filePath} - `);
 			      	resolve(true);
 			      }
 
@@ -267,7 +267,7 @@ function saveFile (filePath, content) {
   * @returns {boolean} - flag that means that folder exist.
 	*/
 function isFolderExist(folderPath){
-	return new Promise( (resolve, reject) => {
+  return folderPath && new Promise( (resolve, reject) => {
 		fs.access(folderPath, (error) => {
       error ? 
         errorMessage('there is no "_docs" folder, please add it to continue work', error) : 
@@ -284,7 +284,7 @@ function isFolderExist(folderPath){
 	* @returns {array} - list of files names.
 	*/
 function getFilesNames(path){
-	return new Promise( (resolve, reject) => {
+  return path && new Promise( (resolve, reject) => {
 		fs.readdir(path, function(error, items) {
 			error ? errorMessage('',error) : resolve(items);
 		});
@@ -329,7 +329,7 @@ function generateNewContent(menu, content){
 	* @returns {boolean} - flag that means that folder exist.
 	*/
 function syncNewDirectory(path){
-	return new Promise( (resolve, reject) => {
+  return path && new Promise( (resolve, reject) => {
 
 		fs.access(path, error => {
 
@@ -374,7 +374,7 @@ function generateMenu(filesNames, activeItem){
   * @returns {object} - json entity that contains information of how much files was written
   * and how much failed.
 	*/
-async function generateFiles (filesNames) {
+async function generateFiles(filesNames = [], resPath, finalPath) {
 
 	let htmlFilesNames = filesNames
   	.filter( fileName => pathLib.parse(fileName).ext === '.html' );
@@ -421,7 +421,7 @@ async function colldoc() {
 	let filesNames = await isFolderExist(resPath) ?
 		await getFilesNames(resPath) : [];
 
-	let statistic = await generateFiles(filesNames);
+	let statistic = await generateFiles(filesNames, resPath, finalPath);
   
   infoMessage(`Files: 
   	written - ${statistic.succed}, 
