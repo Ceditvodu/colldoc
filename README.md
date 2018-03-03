@@ -2,6 +2,10 @@
 
 Colldoc is a Cli tool that helps you build documentaion. To say more clear it simply make a copy of your HTML files in another directory and add in it navigation with local urls to each file.
 
+### Instalation ###
+
+```npm install -g colldoc```
+
 ### How to use ###
 
 - Create documentation folder with "_doc" name or some another.
