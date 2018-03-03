@@ -16,7 +16,7 @@ describe('colldoc', function() {
 
   } );
   
-  describe('#getFileContent', function(){
+  describe('#getFileContent', function () {
 
     it('should return file content with "hello" inside', function () {
 
@@ -30,11 +30,33 @@ describe('colldoc', function() {
     it('must throw an error if there is no such file', function () {
 
       Promise.resolve(colldoc.getFileContent('./sandbox/goust.html'))
-        .then(_=> assert.fail())
-        .catch(_=>assert.ok('error'));
+        .then(_ => assert.fail())
+        .catch(_ => assert.ok('error'));
 
     });
 
   });
+
+  describe('#saveFile', function () {
+
+    it('should return file content with "hello" inside', function () {
+
+      Promise.resolve(colldoc.getFileContent('./sandbox/hello_content.html'))
+        .then(result => {
+          assert.equal(result, 'hello');
+        });
+
+    });
+
+    it('must throw an error if there is no such file', function () {
+
+      Promise.resolve(colldoc.getFileContent('./sandbox/goust.html'))
+        .then(_ => assert.fail())
+        .catch(_ => assert.ok('error'));
+
+    });
+
+  });
+
 } );
 
