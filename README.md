@@ -10,6 +10,10 @@ Colldoc is a Cli tool that helps you build documentaion. To say more clear it si
 - if you whant to use custom names for your documentation folder then type. 
 ```colldoc path/to/parent/directory resourceDirectory resultDirectory```.
 
+### Preview ###
+
+![image](https://ceditvodu.github.io/src/images/colldoc_preview.jpg "colldoc preview image")
+
 ### Todo ###
 
 - [X] make a copy of your files with navigation
