@@ -434,3 +434,4 @@ module.exports = colldoc;
 module.exports.getColor = getColor;
 module.exports.successMessage = successMessage;
 module.exports.getFileContent = getFileContent;
+module.exports.saveFile = saveFile;
