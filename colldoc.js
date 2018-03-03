@@ -1,6 +1,9 @@
 'use strict!';
 /**
-	* @author Ivan Kaduk
+  * @author Ivan Kaduk
+  * @todo
+  * - add ability to choose folders
+  * - order functional
 	*/
 const fs = require('fs');
 const cheerio = require('cheerio');
@@ -11,7 +14,7 @@ if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
   stop();
 }
- 
+
 const path = process.argv[2];
 const resPath = path + '_docs';
 const	finalPath = path + 'docs';
@@ -19,10 +22,10 @@ const	finalPath = path + 'docs';
 /**
 	* @function
 	* @name getColor
-	* @desc filling some colors to comand line
+	* @description filling some colors to comand line
 	* @param {string} color - name of color that it hase next syntacs:
 	* {font|back}{colorName}
-	* @return {string} - color code copitable with comande line.
+	* @returns {string} - color code copitable with comande line.
 	*/
 function getColor(color){
 	let colorMap = {
@@ -53,11 +56,11 @@ function getColor(color){
 /**
 	* @function
 	* @name successMessage
-	* @desc shows succes message it looks like blue line with message and note 
-	* on start.
+	* @description shows succes message it looks like blue line with message and 
+	* note on start.
 	* @param {string} message - stringe that must be shown in cli as a success 
 	* message.
-	* @return {boolean} - flag that means that message was shown. 
+	* @returns {boolean} - flag that means that message was shown. 
 	*/
 function successMessage(message){
 	console.log(
@@ -76,10 +79,11 @@ function successMessage(message){
 /**
 	* @function
 	* @name infoMessage
-	* @desc shows some informational message it looks like green line with message.
+	* @description shows some informational message it looks like green line with 
+	* message.
 	* @param {string} message - stringe that must be shown in cli as a info 
 	* message.
-	* @return {boolean} - flag that means that message was shown. 
+	* @returns {boolean} - flag that means that message was shown. 
 	*/
 function infoMessage(message){
 	console.log(
@@ -98,10 +102,11 @@ function infoMessage(message){
 /**
 	* @function
 	* @name warningMessage
-	* @desc shows some warning message it looks like yellow line with message.
+	* @description shows some warning message it looks like yellow line with 
+	* message.
 	* @param {string} message - stringe that must be shown in cli as a warning 
 	* message.
-	* @return {boolean} - flag that means that message was shown. 
+	* @returns {boolean} - flag that means that message was shown. 
 	*/
 function warningMessage(message){
 	console.log(
@@ -120,11 +125,11 @@ function warningMessage(message){
 /**
   * @function
   * @name errorMessage
-  * @desc shows some error message it looks like red line with message.
+  * @description shows some error message it looks like red line with message.
   * Also it shows error message
   * @param {string} message - stringe that must be shown in cli as a error 
   * message.
-  * @return {boolean} - flag that means that message was shown. 
+  * @returns {boolean} - flag that means that message was shown. 
   */
 function errorMessage(message, error){
 	console.log(
@@ -141,15 +146,14 @@ function errorMessage(message, error){
 	);
 }
 
-
 /**
   * @function
-  * @name errorMessage
-  * @desc shows some error message it looks like red line with message.
-  * Also it shows error message
-  * @param {string} message - stringe that must be shown in cli as a error 
+  * @name confirmMessage
+  * @description shows some prompt it looks like magenta line with message and 
+	* (y/n) dialog, that allows you to choose are you agree with action or not.
+  * @param {string} message - stringe that must be shown in cli as a confirm 
   * message.
-  * @return {boolean} - flag that means that message was shown. 
+  * @returns {boolean} - flag that means that message was shown. 
   */
 function confirmMessage(message) {
 
@@ -180,17 +184,30 @@ function confirmMessage(message) {
 /**
   * @function
   * @name stop
-  * @desc Canceling application.
+  * @description Canceling application.
   */
 function stop() {
   process.exit(-1);
 }
 
+/** 
+  * @function
+  * @name getResourcePath
+  * @description gets second or third parameter from process as 
+  * resource path.
+  * @returns {string} - path to resource files.
+  */
+/** 
+  * @function
+  * @name getFinalPath
+  * @description gets fours parameter from process as final path.
+  * @returns {string} - path to result files.
+  */
 /**
 	* @name getFileContent
-	* @desc read files content.
+	* @description read files content.
 	* @param {string} filePath - adress of file thet need to read.
-	* @return {string} - file content in string. 
+	* @returns {string} - file content in string. 
 	*/
 function getFileContent (filePath) {
 	return new Promise( (resolve,reject) => {
@@ -202,10 +219,10 @@ function getFileContent (filePath) {
 
 /**
 	* @name saveFile
-	* @desc save content to file, or update it, or create new file.
+	* @description save content to file, or update it, or create new file.
 	* @param {string} filePath - adress of file in what must be saved content.
   * @param {string} content - content that must be writen in file.
-  * @return {boolean} - flag that tells that file is saved.
+  * @returns {boolean} - flag that tells that file is saved.
 	*/
 function saveFile (filePath, content) {
 
@@ -247,7 +264,7 @@ function saveFile (filePath, content) {
 	* @function
 	* @name isFolderExist
   * @param {string} folderPath - path that must be insured.
-  * @return {boolean} - flag that means that folder exist.
+  * @returns {boolean} - flag that means that folder exist.
 	*/
 function isFolderExist(folderPath){
 	return new Promise( (resolve, reject) => {
@@ -262,9 +279,9 @@ function isFolderExist(folderPath){
 /**
 	* @function
 	* @name getFilesNames
-	* @desc get list of files from folder.
+	* @description get list of files from folder.
 	* @param {string} path - folder path that contain files.
-	* @return {array} - list of files names.
+	* @returns {array} - list of files names.
 	*/
 function getFilesNames(path){
 	return new Promise( (resolve, reject) => {
@@ -277,10 +294,10 @@ function getFilesNames(path){
 /**
 	* @function
 	* @name generateNewContent
-	* @desc generate html with addition container and side menu.
+	* @description generate html with addition container and side menu.
 	* @param {string} menu - html menu according files that in folder.
 	* @param {string} content - html file content.
-	* @return {string} - new content with additional container and navigation.
+	* @returns {string} - new content with additional container and navigation.
 	*/
 function generateNewContent(menu, content){
 
@@ -307,9 +324,9 @@ function generateNewContent(menu, content){
 /**
 	* @function
 	* @name syncNewDirectory
-	* @desc Check if folder exist and if it not it will create it.
+	* @description Check if folder exist and if it not it will create it.
 	* @param {string} path - expected new folder path.
-	* @return {string} - flag that means that folder exist.
+	* @returns {boolean} - flag that means that folder exist.
 	*/
 function syncNewDirectory(path){
 	return new Promise( (resolve, reject) => {
@@ -336,10 +353,10 @@ function syncNewDirectory(path){
 /**
 	* @function
 	* @name generateMenu
-	* @desc Html menu generator according list of files and active item.
+	* @description Html menu generator according list of files and active item.
   * @param {array} filesNames - list of files names.
   * @param {string} activeItem - name of file which is currently open.
-	* @return {string} - html menu.
+	* @returns {string} - html menu.
 	*/
 function generateMenu(filesNames, activeItem){
 	let menu = filesNames.reduce( ( a, b ) => {
@@ -352,9 +369,9 @@ function generateMenu(filesNames, activeItem){
 /**
 	* @function
 	* @name generateFiles
-	* @desc Making actions from checking if all exist to generating and saving files.
+	* @description Making actions from checking if all exist to generating and saving files.
   * @param {array} filesNames - list of files names.
-  * @return {object} - json entity that contains information of how much files was written
+  * @returns {object} - json entity that contains information of how much files was written
   * and how much failed.
 	*/
 async function generateFiles (filesNames) {
@@ -395,7 +412,7 @@ async function generateFiles (filesNames) {
 /**
 	* @function
 	* @name colldoc
-	* @desc init function that generates menu in html files.
+	* @description init function that generates menu in html files.
 	* @author Ivan Kaduk
 	* @licence MIT 2018
 	*/
