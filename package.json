@@ -1,6 +1,6 @@
 {
   "name": "colldoc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "document collector that use simple html pages",
   "main": "index.js",
   "scripts": {
