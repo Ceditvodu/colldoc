@@ -9,9 +9,9 @@ Colldoc is a Cli tool that helps you build documentaion. To say more clear it si
 ### How to use ###
 
 - Create documentation folder with "_doc" name or some another.
-- add in it html files with documentation information.
-- open bash or cmd and type ```colldoc path/to/parent/directory```.
-- if you whant to use custom names for your documentation folder then type. 
+- Add in it html files with documentation information.
+- Open bash or cmd and type ```colldoc path/to/parent/directory```.
+- If you want to use custom names for your documentation folder then type: 
 ```colldoc path/to/parent/directory resourceDirectory resultDirectory```.
 
 ### Preview ###
@@ -20,9 +20,9 @@ Colldoc is a Cli tool that helps you build documentaion. To say more clear it si
 
 ### Todo ###
 
-- [X] make a copy of your files with navigation
-- [X] choosing own names of folders
-- [X] log messages to consol
-- [X] pormpt for asking questions
-- [ ] sorting first on numbers then on letters
-- [ ] adding file name in file as a html title
+- [X] Make a copy of your files with navigation.
+- [X] Choosing own names of folders.
+- [X] Log messages to consol.
+- [X] Pormpt for asking questions.
+- [ ] Sorting first on numbers then on letters.
+- [ ] Adding file name in file as a html title.
