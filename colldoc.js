@@ -12,8 +12,8 @@ if (process.argv.length <= 2) {
   stop();
 } else if (process.argv[2] === "--help" || process.argv[2] === "-h"){
   console.log(
-    'Usage: colldoc parent_folder_path [source_folder] [result_folder] \n',
-    'Generat documentation from html files \n',
+    '\nUsage: colldoc parent_folder_path [source_folder] [result_folder] \n',
+    'Generat documentation from html files \n\n',
     '-h, --help - show comands description \n',
   );
   stop();
