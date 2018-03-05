@@ -10,6 +10,13 @@
 if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
   stop();
+} else if (process.argv[2] === "--help" || process.argv[2] === "-h"){
+  console.log(
+    'Usage: colldoc parent_folder_path [source_folder] [result_folder] \n',
+    'Generat documentation from html files \n',
+    '-h, --help - show comands description \n',
+  );
+  stop();
 }
 
 const fs = require('fs');
