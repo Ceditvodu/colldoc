@@ -2,10 +2,9 @@
 /**
   * @author Ivan Kaduk
   * @todo
-  * - add ability to choose folders
   * - order functional
-  * - add function --help 
-  * - make class for statistic
+  * - make constants for messages
+  * - order functions according calls 
   */
 if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
