@@ -406,12 +406,7 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
   let htmlFilesNames = filesNames
     .filter( fileName => pathLib.parse(fileName).ext === '.html' );
   
-  let info = {
-    succed: 0,
-    failed: 0,
-  };
-
-  await syncNewDirectory(finalPath);
+  let info = new Statistic();
 
   resPath === finalPath && 
     await confirmMessage('Do you realy whant to rewrite init files?')
