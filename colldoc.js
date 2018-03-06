@@ -221,20 +221,24 @@ function stop() {
   */
 function getResourcePath() {
   return (process.argv.length >= 4) ?
-    process.argv.length[3] :
+    process.argv[3] :
     '_docs';
 }
 
 /** 
-  * @function
-  * @name getFinalPath
-  * @description gets fours parameter from process as final path.
-  * @returns {string} - path to result files.
-  */
+ * @function
+ * @name getFinalPath
+ * @description gets fours parameter from process as final path.
+ * @returns {string} - path to result files.
+ */
 function getFinalPath() {
-  return (process.argv.length >= 5) ?
-    process.argv.length[4] :
-    'docs';
+  if (process.argv.length === 4) {
+    return process.argv[3]+'result';
+  } else if (process.argv.length > 4) {
+    return process.argv[4];
+  } else {
+    return 'docs';
+  }
 }
 
 /**
