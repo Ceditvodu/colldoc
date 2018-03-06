@@ -412,6 +412,8 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
     await confirmMessage('Do you realy whant to rewrite init files?')
       .catch( e => stop() ); 
 
+  await syncNewDirectory(finalPath);
+
   for (let htmlFilesName of htmlFilesNames) {
 
     let menu = generateMenu(htmlFilesNames, htmlFilesName);
