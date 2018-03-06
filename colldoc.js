@@ -24,6 +24,21 @@ const pathLib = require('path');
 const rl = require('readline');
 const path = process.argv[2];
 
+
+
+/**
+  * @class
+  * @description helper class that represent statistic information.
+  * @param {number} succed - count of completed items.
+  * @param {number} failed - count of failed items.
+  */
+class Statistic {
+  constructor(succed, failed) {
+    this.succed = succed || 0;
+    this.failed = failed || 0;
+  }
+}
+
 /**
   * @function
   * @name getColor
