@@ -430,8 +430,8 @@ function saveFile (filePath, content = '') {
   * @description Making actions from checking if all exist to generating and 
   * saving files.
   * @param {array} filesNames - list of files names.
-  * @returns {Statistic} - json entity that contains information of how much files was written
-  * and how much failed.
+  * @returns {Statistic} - json entity that contains information of how much 
+  * files was written and how much failed.
   */
 async function generateFiles(filesNames = [], resPath, finalPath) {
 
