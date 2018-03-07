@@ -52,6 +52,15 @@ class Statistic {
 
 /**
   * @function
+  * @name stop
+  * @description Canceling application.
+  */
+function stop() {
+  process.exit(-1);
+}
+
+/**
+  * @function
   * @name getColor
   * @description filling some colors to comand line
   * @param {string} color - name of color that it hase next syntacs:
@@ -213,15 +222,6 @@ function confirmMessage(message = CONFIRM_INIT_TEXT) {
     });
   } );
 }
- 
-/**
-  * @function
-  * @name stop
-  * @description Canceling application.
-  */
-function stop() {
-  process.exit(-1);
-}
 
 /** 
   * @function
@@ -259,6 +259,90 @@ function getFinalPath() {
 }
 
 /**
+  * @function
+  * @name isFolderExist
+  * @param {string} folderPath - path that must be insured.
+  * @returns {boolean} - flag that means that folder exist.
+  */
+function isFolderExist(folderPath){
+  return folderPath && new Promise( (resolve, reject) => {
+    fs.access(folderPath, (error) => {
+      error ? 
+        errorMessage(`"${folderPath}" ${WAS_NOT_FOUND_ERROR}`, error) : 
+        resolve(true);
+    });
+  } );
+}
+
+/**
+  * @function
+  * @name getFilesNames
+  * @description get list of files from folder.
+  * @param {string} path - folder path that contain files.
+  * @returns {array} - list of files names.
+  */
+function getFilesNames(path) {
+  return path && new Promise((resolve, reject) => {
+    fs.readdir(path, function (error, items) {
+      error ? errorMessage('', error) : resolve(items);
+    });
+  });
+} 
+
+/**
+  * @function
+  * @name syncNewDirectory
+  * @description Check if folder exist and if it not it will create it.
+  * @param {string} path - expected new folder path.
+  * @returns {boolean} - flag that means that folder exist.
+  */
+function syncNewDirectory(path) {
+  return path && new Promise((resolve, reject) => {
+    fs.access(path, error => {
+
+      if (error) {
+
+        fs.mkdir(path, error => {
+
+          error ?
+            errorMessage(`"${path}" ${CANT_CREATE_ERROR}`, error) :
+            resolve(true);
+
+        })
+
+        errorMessage(`"${path}" ${WAS_NOT_FOUND_ERROR}`, error);
+      }
+
+      resolve(true);
+
+    });
+  });
+}
+
+/**
+  * @function
+  * @name generateMenu
+  * @description Html menu generator according list of files and active item.
+  * @param {array} filesNames - list of files names.
+  * @param {string} activeItem - name of file which is currently open.
+  * @returns {string} - html menu.
+  */
+function generateMenu(filesNames = [], activeItem = '') {
+  let menu = filesNames.reduce((a, b) => {
+
+    let active = activeItem === b ? 'active' : '';
+
+    return `${a} <li class="${active}">
+        <a href="${b}">
+          ${pathLib.parse(b).name}
+        </a>
+      </li>`;
+
+  }, '<nav class="menu"><ul>') + '</ul></nav>';
+  return menu;
+}
+
+/**
   * @name getFileContent
   * @description read files content.
   * @param {string} filePath - adress of file thet need to read.
@@ -270,6 +354,38 @@ function getFileContent (filePath) {
       error ? reject( NO_FILES_ERROR + error ) : resolve(response);
     })
   } );
+}
+
+/**
+  * @function
+  * @name generateNewContent
+  * @description generate html with addition container and side menu.
+  * @param {string} menu - html menu according files that in folder.
+  * @param {string} content - html file content.
+  * @returns {string} - new content with additional container and navigation.
+  */
+function generateNewContent(menu = '', content = '') {
+
+  return new Promise((resolve, reject) => {
+
+    let $ = cheerio.load(content);
+
+    let body = $('body').html();
+    $('body').children().remove();
+
+    let columns = `
+      <aside class="menu"></aside>
+      <section class="content"></section>
+    `;
+
+    $('body').append(columns.trim());
+    $('.menu').append(menu.trim());
+    $('.content').append(body.trim());
+
+    resolve($.html());
+
+  });
+
 }
 
 /**
@@ -306,121 +422,6 @@ function saveFile (filePath, content = '') {
       }
     });
   } )
-}
-
-/**
-  * @function
-  * @name isFolderExist
-  * @param {string} folderPath - path that must be insured.
-  * @returns {boolean} - flag that means that folder exist.
-  */
-function isFolderExist(folderPath){
-  return folderPath && new Promise( (resolve, reject) => {
-    fs.access(folderPath, (error) => {
-      error ? 
-        errorMessage(`"${folderPath}" ${WAS_NOT_FOUND_ERROR}`, error) : 
-        resolve(true);
-    });
-  } );
-}
-
-/**
-  * @function
-  * @name getFilesNames
-  * @description get list of files from folder.
-  * @param {string} path - folder path that contain files.
-  * @returns {array} - list of files names.
-  */
-function getFilesNames(path){
-  return path && new Promise( (resolve, reject) => {
-    fs.readdir(path, function(error, items) {
-      error ? errorMessage('',error) : resolve(items);
-    });
-  } );
-} 
-
-/**
-  * @function
-  * @name generateNewContent
-  * @description generate html with addition container and side menu.
-  * @param {string} menu - html menu according files that in folder.
-  * @param {string} content - html file content.
-  * @returns {string} - new content with additional container and navigation.
-  */
-function generateNewContent(menu = '', content = ''){
-
-  return new Promise( (resolve, reject) => {
-    
-    let $ = cheerio.load(content);
-
-    let body = $('body').html();
-    $('body').children().remove();
-
-    let columns = `
-      <aside class="menu"></aside>
-      <section class="content"></section>
-    `;
-
-    $('body').append(columns.trim());
-    $('.menu').append(menu.trim());
-    $('.content').append(body.trim());
-
-    resolve($.html());
-
-  } );
-
-}
-
-/**
-  * @function
-  * @name syncNewDirectory
-  * @description Check if folder exist and if it not it will create it.
-  * @param {string} path - expected new folder path.
-  * @returns {boolean} - flag that means that folder exist.
-  */
-function syncNewDirectory(path){
-  return path && new Promise( (resolve, reject) => {
-    fs.access(path, error => {
-      if (error) {
-        
-        fs.mkdir(path, error => {
-          
-          error ? 
-          errorMessage(`"${path}" ${CANT_CREATE_ERROR}`, error) : 
-          resolve(true);
-          
-        })
-        
-        errorMessage(`"${path}" ${WAS_NOT_FOUND_ERROR}`, error);
-      }
-
-      resolve(true);
-
-    });
-  } );
-}
-
-/**
-  * @function
-  * @name generateMenu
-  * @description Html menu generator according list of files and active item.
-  * @param {array} filesNames - list of files names.
-  * @param {string} activeItem - name of file which is currently open.
-  * @returns {string} - html menu.
-  */
-function generateMenu(filesNames = [], activeItem = ''){
-  let menu = filesNames.reduce( ( a, b ) => {
-    
-      let active = activeItem === b ? 'active' : '';
-      
-      return `${a} <li class="${active}">
-        <a href="${b}">
-          ${pathLib.parse(b).name}
-        </a>
-      </li>`;
-
-    }, '<nav class="menu"><ul>' ) + '</ul></nav>';
-  return menu;
 }
 
 /**
