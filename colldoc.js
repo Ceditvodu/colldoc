@@ -3,7 +3,6 @@
   * @author Ivan Kaduk
   * @todo
   * - order functional
-  * - make constants for messages
   * - order functions according calls 
   */
 
