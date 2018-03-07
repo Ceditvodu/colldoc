@@ -6,6 +6,7 @@
   * - make constants for messages
   * - order functions according calls 
   */
+
 if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
   stop();
@@ -24,7 +25,18 @@ const pathLib = require('path');
 const rl = require('readline');
 const path = process.argv[2];
 
+const constants = require('./constants');
+const CHECK_PERMISSION_ERROR = constants.CHECK_PERMISSION_ERROR;
+const FILE_WRITTEN = constants.FILE_WRITTEN;
+const WAS_NOT_FOUND_ERROR = constants.WAS_NOT_FOUND_ERROR; 
+const CANT_CREATE_ERROR = constants.CANT_CREATE_ERROR; 
+const REWRITE_INSURE = constants.REWRITE_INSURE; 
+const CONFIRM_INIT_TEXT = constants.CONFIRM_INIT_TEXT; 
+const NO_FILES_ERROR = constants.NO_FILES_ERROR;
 
+const FINAL_FOLDER_SUFIX = constants.FINAL_FOLDER_SUFIX; 
+const FINAL_FOLDER = constants.FINAL_FOLDER; 
+const RESOURCE_FOLDER = constants.RESOURCE_FOLDER; 
 
 /**
   * @class
@@ -177,7 +189,7 @@ function errorMessage(message = '', error){
   * message.
   * @returns {boolean} - flag that means that message was shown. 
   */
-function confirmMessage(message = 'do yo whant to continue') {
+function confirmMessage(message = CONFIRM_INIT_TEXT) {
 
   let ask = rl.createInterface({
     input: process.stdin,
@@ -222,7 +234,7 @@ function stop() {
 function getResourcePath() {
   return (process.argv.length >= 4) ?
     process.argv[3] :
-    '_docs';
+    RESOURCE_FOLDER;
 }
 
 /** 
@@ -233,11 +245,17 @@ function getResourcePath() {
  */
 function getFinalPath() {
   if (process.argv.length === 4) {
-    return process.argv[3]+'result';
+    
+    return process.argv[3] + FINAL_FOLDER_SUFIX;
+    
   } else if (process.argv.length > 4) {
+    
     return process.argv[4];
+    
   } else {
-    return 'docs';
+
+    return FINAL_FOLDER;
+
   }
 }
 
@@ -250,7 +268,7 @@ function getFinalPath() {
 function getFileContent (filePath) {
   return filePath && new Promise( (resolve,reject) => {
     fs.readFile(filePath, 'utf8', function(error, response) {
-      error ? reject( 'we have no files' + error ) : resolve(response);
+      error ? reject( NO_FILES_ERROR + error ) : resolve(response);
     })
   } );
 }
@@ -269,7 +287,7 @@ function saveFile (filePath, content = '') {
     fs.open(filePath, 'w+', function(error, document) {
       if (error){
 
-        warningMessage(`${filePath} - file didn\'t written (check file permissions)`);
+        warningMessage(`${filePath} - ${CHECK_PERMISSION_ERROR}`);
         reject();
 
       }else{
@@ -281,7 +299,7 @@ function saveFile (filePath, content = '') {
             resolve(true);
           }
           fs.close(document, function() {
-            successMessage(`${filePath} - file written`)
+            successMessage(`${filePath} - ${FILE_WRITTEN}`)
             resolve(true);
           })
         });
@@ -301,7 +319,7 @@ function isFolderExist(folderPath){
   return folderPath && new Promise( (resolve, reject) => {
     fs.access(folderPath, (error) => {
       error ? 
-        errorMessage('there is no "_docs" folder, please add it to continue work', error) : 
+        errorMessage(`"${folderPath}" ${WAS_NOT_FOUND_ERROR}`, error) : 
         resolve(true);
     });
   } );
@@ -364,11 +382,13 @@ function syncNewDirectory(path){
         
         fs.mkdir(path, error => {
           
-          error ? errorMessage('cant create "docs" directory', error) : resolve(true);
+          error ? 
+          errorMessage(`"${path}" ${CANT_CREATE_ERROR}`, error) : 
+          resolve(true);
           
         })
         
-        errorMessage('there is no "docs" folder, please add it to continue work', error);
+        errorMessage(`"${path}" ${WAS_NOT_FOUND_ERROR}`, error);
       }
 
       resolve(true);
@@ -409,7 +429,7 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
   let info = new Statistic();
 
   resPath === finalPath && 
-    await confirmMessage('Do you realy whant to rewrite init files?')
+    await confirmMessage(REWRITE_INSURE_TEXT)
       .catch( e => stop() ); 
 
   await syncNewDirectory(finalPath);
