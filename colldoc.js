@@ -208,7 +208,7 @@ function confirmMessage(message = CONFIRM_INIT_TEXT) {
     
   return new Promise( (resolve, reject) => {
     ask.question(`${styledMessage} (y/n) \n`, answer => {
-      answer === 'y' ?
+      (answer === 'y') || (answer ===  'yes') ?
         resolve(true) : reject();
       ask.close();
     });
