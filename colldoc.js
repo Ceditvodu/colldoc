@@ -357,10 +357,14 @@ function generateNewContent(menu = '', content = ''){
     let body = $('body').html();
     $('body').children().remove();
 
-    let columns = '<aside class="menu"></aside><section class="content"></section>';
-    $('body').append(columns);
-    $('.menu').append(menu);
-    $('.content').append(body);
+    let columns = `
+      <aside class="menu"></aside>
+      <section class="content"></section>
+    `;
+
+    $('body').append(columns.trim());
+    $('.menu').append(menu.trim());
+    $('.content').append(body.trim());
 
     resolve($.html());
 
@@ -407,8 +411,15 @@ function syncNewDirectory(path){
   */
 function generateMenu(filesNames = [], activeItem = ''){
   let menu = filesNames.reduce( ( a, b ) => {
+    
       let active = activeItem === b ? 'active' : '';
-      return `${a}<li class="${active}"><a href="${b}">${pathLib.parse(b).name}</a></li>`;
+      
+      return `${a} <li class="${active}">
+        <a href="${b}">
+          ${pathLib.parse(b).name}
+        </a>
+      </li>`;
+
     }, '<nav class="menu"><ul>' ) + '</ul></nav>';
   return menu;
 }
@@ -416,7 +427,8 @@ function generateMenu(filesNames = [], activeItem = ''){
 /**
   * @function
   * @name generateFiles
-  * @description Making actions from checking if all exist to generating and saving files.
+  * @description Making actions from checking if all exist to generating and 
+  * saving files.
   * @param {array} filesNames - list of files names.
   * @returns {Statistic} - json entity that contains information of how much files was written
   * and how much failed.
