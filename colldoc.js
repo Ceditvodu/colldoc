@@ -372,7 +372,7 @@ function generateNewContent(menu = '', content = '') {
     let $ = cheerio.load(content);
 
     let body = $('body').html();
-    $('body').children().remove();
+    $('body').text('');
 
     let columns = `
       <aside class="menu"></aside>
