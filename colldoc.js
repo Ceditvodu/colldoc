@@ -3,7 +3,8 @@
   * @author Ivan Kaduk
   * @todo
   * - order functional
-  * - order functions according calls 
+  * - add title in file with name of file name
+  * - make ability to add this title as a file header
   */
 
 if (process.argv.length <= 2) {
