@@ -329,28 +329,34 @@ function syncNewDirectory(path) {
   */
 function orderFilesNames(filesNames) {
   let orderedFilesNames = filesNames.slice().sort( function (a, b) { 
-    let diraction;
-    [].forEach.call(a, (_, index) => {
+    for (index in a) {
       let first = a[index];
       let second = b[index] || '';
 
-      if ( isNaN(first) !== isNaN(second) ) {
-        if ( isNaN(first) === false ) {
-          return 1;
-        } else {
+      if (isNaN(first) !== isNaN(second)) {
+        if (isNaN(first) === false) {
           return -1;
+        } else {
+          return 1;
         }
       }
-      
-      if ( first < second ) {
+
+      if (first === '_') {
         return 1;
-      } else if ( first > second ) {
+      }
+      
+      if (second === '_') {
         return -1;
       }
 
-      return 0;
+      if (first < second) {
+        return -1;
+      } else if (first > second) {
+        return 1;
+      }
 
-    });
+      return 0;
+    }
   });
   return orderedFilesNames
 }
@@ -366,10 +372,8 @@ function orderFilesNames(filesNames) {
 function generateMenu(filesNames = [], activeItem = '') {
   
   let orderedFilesNames = orderFilesNames(filesNames);
-  console.log(orderedFilesNames);
   
-  // let menu = orderedFilesNames.reduce((a, b) => {
-  let menu = filesNames.reduce((a, b) => {
+  let menu = orderedFilesNames.reduce((a, b) => {
 
     let active = activeItem === b ? 'active' : '';
 
