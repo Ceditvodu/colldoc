@@ -2,8 +2,9 @@
 /**
   * @author Ivan Kaduk
   * @todo
-  * - add title in file with name of file name
-  * - make ability to add this title as a file header
+  * - implemate params delegate function 
+  * - make ability to add this title as a file header as param
+  * - add minify functional as param
   */
 
 if (process.argv.length <= 2) {
