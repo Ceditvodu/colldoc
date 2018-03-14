@@ -400,21 +400,33 @@ function getFileContent (filePath) {
   * @param {string} content - html file content.
   * @returns {string} - new content with additional container and navigation.
   */
-function generateNewContent(menu = '', content = '') {
+function generateNewContent(menu = '', fileName = '', content = '') {
 
   return new Promise((resolve, reject) => {
 
     let $ = cheerio.load(content);
 
     let body = $('body').html();
-    $('body').text('');
-
     let columns = `
       <aside class="menu"></aside>
       <section class="content"></section>
     `;
+    let titleText = pathLib.basename(fileName, '.html');
+    let title = `
+      <tite>${titleText}</tite>
+    `;
 
-    $('body').append(columns.trim());
+    let $body = $('body'); 
+    let $title = $('title');
+    let $head = $('head');
+
+    $body.text('');
+
+    $body.append(columns.trim());
+    $title.html() ? 
+      $title.text(titleText) :
+      $head.append(title);
+
     $('.menu').append(menu.trim());
     $('.content').append(body.trim());
 
@@ -482,15 +494,15 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
 
   await syncNewDirectory(finalPath);
 
-  for (let htmlFilesName of htmlFilesNames) {
+  for (let fileName of htmlFilesNames) {
 
-    let menu = generateMenu(htmlFilesNames, htmlFilesName);
+    let menu = generateMenu(htmlFilesNames, fileName);
 
-    let filePath = `${resPath}/${htmlFilesName}`;
-    let newFilePath = `${finalPath}/${htmlFilesName}`;
+    let filePath = `${resPath}/${fileName}`;
+    let newFilePath = `${finalPath}/${fileName}`;
 
     let fileContent = await getFileContent(filePath);
-    let newFileContent = await generateNewContent(menu, fileContent);
+    let newFileContent = await generateNewContent(menu, fileName, fileContent);
 
     await saveFile(newFilePath, newFileContent)
       .then( _ => info.succed = ++info.succed )
