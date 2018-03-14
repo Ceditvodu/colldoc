@@ -2,7 +2,6 @@
 /**
   * @author Ivan Kaduk
   * @todo
-  * - order functional
   * - add title in file with name of file name
   * - make ability to add this title as a file header
   */
@@ -336,22 +335,13 @@ function orderFilesNames(filesNames) {
       if (isNaN(first) !== isNaN(second)) {
         if (isNaN(first) === false) {
           return -1;
-        } else {
-          return 1;
-        }
-      }
-
-      if (first === '_') {
+        } 
         return 1;
       }
-      
-      if (second === '_') {
-        return -1;
-      }
 
-      if (first < second) {
+      if ((second === '_') || (first < second)) {
         return -1;
-      } else if (first > second) {
+      } else if ((first === '_') || (first > second)) {
         return 1;
       }
 
