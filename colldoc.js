@@ -10,13 +10,6 @@
 if (process.argv.length <= 2) {
   console.log("Usage: " + __filename + " path/to/directory");
   stop();
-} else if (process.argv[2] === "--help" || process.argv[2] === "-h"){
-  console.log(
-    '\nUsage: colldoc parent_folder_path [source_folder] [result_folder] \n',
-    'Generat documentation from html files \n\n',
-    '-h, --help - show comands description \n',
-  );
-  stop();
 }
 
 const fs = require('fs');
@@ -222,6 +215,36 @@ function confirmMessage(message = CONFIRM_INIT_TEXT) {
       ask.close();
     });
   } );
+}
+
+/**
+  * @function 
+  * @name delegateParams
+  * @description helps in work with app arguments
+  */
+function delegateParams(arguments = []) {
+  let actionMap = [];
+  let params = arguments.filter( argument => {
+    return argument[0] == '-';
+  } );
+
+  params.forEach(param => {
+    switch(param){
+      case '-h':
+      case '--help': 
+        !actionMap.includes('help') && actionMap.push('help');
+      case '-t':
+      case '--title':
+        !actionMap.includes('title') && actionMap.push('title');
+      case '-c':
+      case '--compress':
+        !actionMap.includes('compress') && actionMap.push('compress');
+    }
+  });
+
+  return actionName => {
+    return actionMap.includes(actionName); 
+  };
 }
 
 /** 
@@ -515,12 +538,30 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
 
 /**
   * @function
+  * @name help 
+  * @description shows apps interface reference
+  */
+function help() {
+  console.log(
+    '\nUsage: colldoc parent_folder_path [source_folder] [result_folder] \n',
+    'Generat documentation from html files \n\n',
+    '-h, --help - show comands description \n',
+  );
+  stop();
+}
+
+/**
+  * @function
   * @name colldoc
   * @description init function that generates menu in html files.
   * @author Ivan Kaduk
   * @licence MIT 2018
   */
 async function colldoc() {
+
+  const isNeedTo = delegateParams(process.argv);
+
+  if (isNeedTo('help')) help();
 
   let resPath = getResourcePath();
   let finalPath = getFinalPath();
