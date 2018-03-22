@@ -2,21 +2,14 @@
 /**
   * @author Ivan Kaduk
   * @todo
-  * - implemate params delegate function 
   * - make ability to add this title as a file header as param
   * - add minify functional as param
   */
-
-if (process.argv.length <= 2) {
-  console.log("Usage: " + __filename + " path/to/directory");
-  stop();
-}
 
 const fs = require('fs');
 const cheerio = require('cheerio');
 const pathLib = require('path');
 const rl = require('readline');
-const path = process.argv[2];
 
 const constants = require('./constants');
 const CHECK_PERMISSION_ERROR = constants.CHECK_PERMISSION_ERROR;
@@ -27,7 +20,6 @@ const REWRITE_INSURE = constants.REWRITE_INSURE;
 const CONFIRM_INIT_TEXT = constants.CONFIRM_INIT_TEXT; 
 const NO_FILES_ERROR = constants.NO_FILES_ERROR;
 
-const FINAL_FOLDER_SUFIX = constants.FINAL_FOLDER_SUFIX; 
 const FINAL_FOLDER = constants.FINAL_FOLDER; 
 const RESOURCE_FOLDER = constants.RESOURCE_FOLDER; 
 
@@ -220,7 +212,8 @@ function confirmMessage(message = CONFIRM_INIT_TEXT) {
 /**
   * @function 
   * @name delegateParams
-  * @description helps in work with app arguments
+  * @param {array} arguments - array of arguments from app process.
+  * @description helps in work with app arguments.
   */
 function delegateParams(arguments = []) {
   let actionMap = [];
@@ -247,38 +240,41 @@ function delegateParams(arguments = []) {
   };
 }
 
-/** 
+/**
   * @function
-  * @name getResourcePath
-  * @description gets second or third parameter from process as 
-  * resource path.
-  * @returns {string} - path to resource files.
+  * @name help 
+  * @description shows apps interface reference.
   */
-function getResourcePath() {
-  return (process.argv.length >= 4) ?
-    process.argv[3] :
-    RESOURCE_FOLDER;
+function help() {
+  console.log(
+    '\nUsage: colldoc [source_folder] [result_folder] \n',
+    'Generat documentation from html files \n\n',
+    '-h, --help - show comands description \n',
+  );
+  stop();
 }
 
 /** 
- * @function
- * @name getFinalPath
- * @description gets fours parameter from process as final path.
- * @returns {string} - path to result files.
- */
-function getFinalPath() {
-  if (process.argv.length === 4) {
-    
-    return process.argv[3] + FINAL_FOLDER_SUFIX;
-    
-  } else if (process.argv.length > 4) {
-    
-    return process.argv[4];
-    
-  } else {
+  * @function
+  * @name getPathes
+  * @description help to get pathes from init process or set default.
+  * @param {array} arguments - array with all proccess arguments. 
+  * @returns {string} - path to resource files.
+  */
+function getPathes(arguments = []) {
+  let params = arguments.filter(argument => {
+    return argument[0] !== '-';
+  });
 
-    return FINAL_FOLDER;
+  let pathes = params.splice(3,params.length - 3);
 
+  return {
+    resource: _ => {
+      return pathes[0] ? pathes[0] : RESOURCE_FOLDER;
+    },
+    final: _ => {
+      return pathes[1] ? pathes[1] : FINAL_FOLDER;
+    }
   }
 }
 
@@ -538,24 +534,9 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
 
 /**
   * @function
-  * @name help 
-  * @description shows apps interface reference
-  */
-function help() {
-  console.log(
-    '\nUsage: colldoc parent_folder_path [source_folder] [result_folder] \n',
-    'Generat documentation from html files \n\n',
-    '-h, --help - show comands description \n',
-  );
-  stop();
-}
-
-/**
-  * @function
   * @name colldoc
   * @description init function that generates menu in html files.
   * @author Ivan Kaduk
-  * @licence MIT 2018
   */
 async function colldoc() {
 
@@ -563,14 +544,15 @@ async function colldoc() {
 
   if (isNeedTo('help')) help();
 
-  let resPath = getResourcePath();
-  let finalPath = getFinalPath();
+  let pathes = getPathes(process.argv);
+  let resPath = pathes.resource();
+  let finalPath = pathes.final();
 
   let filesNames = await isFolderExist(resPath) ?
     await getFilesNames(resPath) : [];
 
   let statistic = await generateFiles(filesNames, resPath, finalPath);
-  
+
   infoMessage(`Files: 
     written - ${statistic.succed}, 
     failed - ${statistic.failed}`);

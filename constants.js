@@ -7,7 +7,6 @@ module.exports.REWRITE_INSURE = 'Do you realy whant to rewrite init files?';
 module.exports.CONFIRM_INIT_TEXT = 'Do yo whant to continue?';
 module.exports.NO_FILES_ERROR = 'there is no files';
 
-module.exports.FINAL_FOLDER_SUFIX = 'result';
 module.exports.FINAL_FOLDER = 'docs';
 module.exports.RESOURCE_FOLDER = '_docs';
 
