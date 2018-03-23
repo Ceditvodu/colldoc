@@ -400,7 +400,7 @@ async function colldoc() {
     written - ${statistic.succed}, 
     failed - ${statistic.failed}`);
 
-    stop();
+  stop();
 }
 
 module.exports = colldoc; 
