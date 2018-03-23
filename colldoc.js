@@ -351,7 +351,7 @@ async function generateFiles(filesNames = [], resPath, finalPath) {
   let info = new Statistic();
 
   resPath === finalPath && 
-    await confirmMessage(REWRITE_INSURE_TEXT)
+    await confirmMessage(REWRITE_INSURE)
       .catch( e => stop() ); 
 
   await syncNewDirectory(finalPath);
