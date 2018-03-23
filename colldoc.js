@@ -109,7 +109,7 @@ function getPathes(arguments = []) {
     return argument[0] !== '-';
   });
 
-  let pathes = params.splice(3,params.length - 3);
+  let pathes = params.splice(2,params.length - 2);
 
   return {
     resource: _ => {
